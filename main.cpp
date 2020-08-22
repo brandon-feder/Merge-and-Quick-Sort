@@ -70,8 +70,9 @@ std::forward_list<int> mergesort(std::forward_list<int> listA, int size)
 }
 
 // Pivot function for the quick sort algorythm
-std::list<int>::iterator pivot(std::list<int>::iterator start, std::list<int>::iterator end)
+std::list<int>::iterator pivot(std::list<int>::iterator start, std::list<int>::iterator end, int *l)
 {
+    int iIndex = -1;
     // Setting up pivot, and two markers
     std::list<int>::iterator pivot = end;
     --pivot;
@@ -88,20 +89,24 @@ std::list<int>::iterator pivot(std::list<int>::iterator start, std::list<int>::i
         if(*j < *pivot)
         {
             ++i; //increment i
+            ++iIndex;
             std::iter_swap( i, j ); // swap i and j
         }
     }
 
     ++i;
+    ++iIndex;
     std::iter_swap( i, pivot );
 
+    *l = iIndex;
     return i;
 }
 
 
 // Pivot function for the quick sort algorythm
-std::forward_list<int>::iterator pivot(std::forward_list<int>::iterator pre_start, std::forward_list<int>::iterator pre_end)
+std::forward_list<int>::iterator pivot(std::forward_list<int>::iterator pre_start, std::forward_list<int>::iterator pre_end, int *l)
 {
+    int iIndex = -1;
     // Setting up pivot, and two markers
     std::forward_list<int>::iterator pivot = pre_end;
 
@@ -117,6 +122,7 @@ std::forward_list<int>::iterator pivot(std::forward_list<int>::iterator pre_star
         if(*j < *pivot)
         {
             ++i; //increment i
+            ++iIndex;
             std::iter_swap( i, j ); // swap i and j
         }
     }
@@ -124,17 +130,20 @@ std::forward_list<int>::iterator pivot(std::forward_list<int>::iterator pre_star
     std::forward_list<int>::iterator pre_i = i;
 
     ++i;
+    ++iIndex;
     std::iter_swap( i, pivot );
 
+    *l = iIndex;
     return pre_i;
 }
 
-void quicksort(std::list<int>::iterator start, std::list<int>::iterator end)
+void quicksort(std::list<int>::iterator start, std::list<int>::iterator end, int length)
 {
-    if(std::distance(start, end) > 1)
+    if(length > 1)
     {
+        int l;
         // Get the pivot
-        std::list<int>::iterator pi = pivot(start, end);
+        std::list<int>::iterator pi = pivot(start, end, &l);
 
         // Get the start and end of the first part
         std::list<int>::iterator listA_start = start;
@@ -149,23 +158,25 @@ void quicksort(std::list<int>::iterator start, std::list<int>::iterator end)
         {
             ++listA_end;
             ++listB_start;
+            ++l;
         }
 
         // Quick Sort again
-        quicksort(listA_start, listA_end);
-        quicksort(listB_start, listB_end);
+        quicksort(listA_start, listA_end, l);
+        quicksort(listB_start, listB_end, length - l);
 
 
     }
 
 }
 
-void quicksort(std::forward_list<int>::iterator pre_start, std::forward_list<int>::iterator pre_end)
+void quicksort(std::forward_list<int>::iterator pre_start, std::forward_list<int>::iterator pre_end, int length)
 {
-    if(std::distance(pre_start, pre_end) > 1)
+    if(length > 1)
     {
+        int l;
         // Get the pivot
-        std::forward_list<int>::iterator pre_pi = pivot(pre_start, pre_end);
+        std::forward_list<int>::iterator pre_pi = pivot(pre_start, pre_end, &l);
 
         // // Get the start and end of the first part
         std::forward_list<int>::iterator listA_start = pre_start;
@@ -180,14 +191,13 @@ void quicksort(std::forward_list<int>::iterator pre_start, std::forward_list<int
         {
             ++listA_end;
             ++listB_start;
+            ++l;
         }
 
         //
         // Quick Sort again
-        quicksort(listA_start, listA_end);
-        quicksort(listB_start, listB_end);
-
-
+        quicksort(listA_start, listA_end, l);
+        quicksort(listB_start, listB_end, length - l);
     }
 
 }
@@ -249,7 +259,7 @@ int main()
     // Get the start time
     begin = std::chrono::steady_clock::now();
 
-    quicksort(doubleList_quick.begin(), doubleList_quick.end());
+    quicksort(doubleList_quick.begin(), doubleList_quick.end(), LENGTH);
 
     // Get the end time
     end = std::chrono::steady_clock::now();
@@ -268,7 +278,7 @@ int main()
     std::advance(end_iterator, LENGTH);
 
 
-    quicksort(singleList_quick.before_begin(), end_iterator);
+    quicksort(singleList_quick.before_begin(), end_iterator, LENGTH);
 
     // Get the end time
     end = std::chrono::steady_clock::now();
