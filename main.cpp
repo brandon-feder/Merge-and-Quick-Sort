@@ -4,7 +4,7 @@
 #include <forward_list>
 #include <stdlib.h> // rand()
 
-const int LENGTH = 10000;
+const int LENGTH = 1000000;
 
 template<class iterType>
 void printList(iterType start, iterType end)
@@ -116,7 +116,7 @@ std::forward_list<int>::iterator pivot(std::forward_list<int>::iterator pre_star
     j++;
 
     // for every j from 0 to pivot
-    for(; std::distance(j, pivot) > 0; ++j)
+    for(; j != pivot; ++j)
     {
         // If the value j references < then that of the pivot
         if(*j < *pivot)
